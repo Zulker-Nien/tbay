@@ -1,0 +1,48 @@
+services:
+  frontend:
+    build:
+      context: ./tbay-frontend
+    restart: always
+    ports:
+      - "5173:5173"
+    environment:
+      - REACT_APP_GRAPHQL_URI= http://localhost:3001/graphql
+    depends_on:
+      - backend
+
+  backend:
+    build:
+      context: ./tbay-backend
+    ports:
+      - "3000:3000"
+      - "3001:3001"
+    environment:
+      - DATABASE_URL=postgresql://postgres:password@postgres:5432/tbay_db?schema=public
+      - JWT_ACCESS_SECRET=hDhSWW7Kq4o0o8ECGgSys0MVQasD3wG6vXK1XTXZpHCQG4Liyp5YKI7ziQxXgTTk
+      - JWT_REFRESH_SECRET=uS2HKyAs6lkEhT6duFjWc8T4mMySFJoQseLIxTVX08eV7D7cbA6jjjjeZPxtxQrj
+      - NODE_ENV=development
+    depends_on:
+      postgres:
+        condition: service_healthy
+    command: sh -c "npx prisma migrate deploy && npm start"
+
+  postgres:
+    image: postgres:latest
+    restart: always
+    container_name: postgres-db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: tbay_db
+    ports:
+      - "5433:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:
