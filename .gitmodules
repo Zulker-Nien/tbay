@@ -1,0 +1,6 @@
+[submodule "tbay-backend"]
+	path = tbay-backend
+	url = https://github.com/Zulker-Nien/tbay-backend.git
+[submodule "tbay-frontend"]
+	path = tbay-frontend
+	url = https://github.com/Zulker-Nien/tbay-frontend.git
